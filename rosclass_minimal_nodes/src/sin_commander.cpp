@@ -4,14 +4,13 @@
 // publishes velocity on topic "velocity" 
 #include<ros/ros.h> 
 #include<std_msgs/Float64.h> 
+#include<rosclass_minimal_nodes/sine_msg.h>
 #include<math.h>
 #include<iostream>
 #include<string>
 #include<sstream>
 
 using namespace std;
-
-double PI = 3.14159265;
 
 std_msgs::Float64 g_vel_cmd;
 
@@ -23,7 +22,7 @@ void myCallbackVelCmd(const std_msgs::Float64& message_holder) {
 }
 
 int main(int argc, char **argv) {
-    ros::init(argc, argv, "sin_commander"); //name this node 
+    ros::init(argc, argv, "sin_service"); //name this node 
     // when this compiled code is run, ROS will recognize it as a node called "sin_commander"
     ros::NodeHandle nh; // node handle
     ros::Subscriber my_subscriber_object = nh.subscribe("vel_cmd", 1, myCallbackVelCmd);
@@ -36,12 +35,13 @@ int main(int argc, char **argv) {
     double dt_sin = 0.0;
     g_vel_cmd.data = 0.0;
 
+    /**
     cout << "Please enter an real value for amplitude: ";
     cin >> amplitude;
     cout << "Please enter an real value for frequency: ";
     cin >> frequency;
     cout << "The value you entered for amplitude is " << amplitude << "and the value for frequency is" << frequency;
-    
+    **/
     //Y corrdinate evaluated at time t will be the velocity to be commanded
     while (ros::ok()) {
         //do sin stuff here
