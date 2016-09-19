@@ -49,3 +49,5 @@ cs_add_executable(rc_minimal_subscriber src/minimal_subscriber.cpp)
 cs_add_executable(rc_minimal_simulator src/minimal_simulator.cpp)
 
 cs_add_executable(rc_minimal_controller src/minimal_controller.cpp)
+
+cs_add_executable(rc_sin_commander src/sin_commander.cpp)
