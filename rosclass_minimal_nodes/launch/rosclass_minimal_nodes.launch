@@ -1,0 +1,7 @@
+ 
+<launch>
+<node name="publisher" pkg="rosclass_minimal_nodes" type="sleepy_minimal_publisher"/>
+<node name="subscriber" pkg="rosclass_minimal_nodes" type="minimal_subscriber"/>
+</launch>
+  
+ 
