@@ -13,8 +13,8 @@
 using namespace std;
 
 std_msgs::Float64 g_vel_cmd;
-double amplitude;
-double frequency;
+double amplitude_;
+double frequency_;
 
 
 void myCallbackVelCmd(const std_msgs::Float64& message_holder) {
@@ -29,11 +29,11 @@ bool callBack(rosclass_minimal_nodes::sine_msg::Request &request, rosclass_minim
 {    
 	ROS_INFO("callback activated");
     //initilize 
-    amplitude = 0.0;
-    frequency = 0.0;
+    //amplitude = 0.0;
+    //frequency = 0.0;
     request.invoked = true;
-    amplitude = response.amplitude;
-    frequency = response.frequency;
+    amplitude_ = response.amplitude;
+    frequency_ = response.frequency;
 
     return true;
 }
@@ -51,19 +51,16 @@ int main(int argc, char **argv) {
     //initilize 
     double dt_sin = 0.0;
     g_vel_cmd.data = 0.0;
+    amplitude_=0.0;
+    frequency_=0.0;
 
-    /**
-    cout << "Please enter an real value for amplitude: ";
-    cin >> amplitude;
-    cout << "Please enter an real value for frequency: ";
-    cin >> frequency;
-    cout << "The value you entered for amplitude is " << amplitude << "and the value for frequency is" << frequency;
-    **/
+
+    
     //Y corrdinate evaluated at time t will be the velocity to be commanded
     while (ros::ok()) {
         //do sin stuff here
 
-        g_vel_cmd.data = amplitude*sin(frequency*dt_sin);//+2PI
+        g_vel_cmd.data = amplitude_*sin(frequency_*dt_sin);//+2PI
         dt_sin = dt_sin+0.01; //increments delt t 
         my_publisher_object.publish(g_vel_cmd); // publish the control effort computed by this 
         //sin_commander

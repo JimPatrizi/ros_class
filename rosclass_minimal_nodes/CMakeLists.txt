@@ -50,6 +50,6 @@ cs_add_executable(rc_minimal_simulator src/minimal_simulator.cpp)
 
 cs_add_executable(rc_minimal_controller src/minimal_controller.cpp)
 
-cs_add_executable(rc_sin_service src/sin_commander.cpp)
+cs_add_executable(rc_sin_commander src/sin_commander.cpp)
 
-#cs_add_executable(rc_sin_client src/sin_client.cpp)
+cs_add_executable(rc_sin_client src/sin_client.cpp)
