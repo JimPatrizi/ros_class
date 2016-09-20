@@ -13,6 +13,9 @@
 using namespace std;
 
 std_msgs::Float64 g_vel_cmd;
+double amplitude;
+double frequency;
+
 
 void myCallbackVelCmd(const std_msgs::Float64& message_holder) {
     // check for data on topic "vel_cmd" 
@@ -21,17 +24,28 @@ void myCallbackVelCmd(const std_msgs::Float64& message_holder) {
     //main prog. 
 }
 
+
+void callBack(rosclass_minimal_nodes::sine_msg::Request &request, rosclass_minimal_nodes::sine_msg::Response &response)
+{    ROS_INFO("callback activated");
+    //initilize 
+    amplitude = 0.0;
+    frequency = 0.0;
+    request.invoked = true;
+    amplitude = response.amplitude;
+    frequency = response.frequency;
+}
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "sin_service"); //name this node 
     // when this compiled code is run, ROS will recognize it as a node called "sin_commander"
     ros::NodeHandle nh; // node handle
+    ros::ServiceServer service = nh.advertiseService("sin_cmd", callBack)
     ros::Subscriber my_subscriber_object = nh.subscribe("vel_cmd", 1, myCallbackVelCmd);
     ros::Publisher my_publisher_object = nh.advertise<std_msgs::Float64>("vel_cmd", 1);
+
     ros::Rate naptime(1.0/0.1); 
 
     //initilize 
-    double amplitude = 0.0;
-    double frequency = 0.0;
     double dt_sin = 0.0;
     g_vel_cmd.data = 0.0;
 
