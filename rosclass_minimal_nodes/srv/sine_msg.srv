@@ -1,4 +1,4 @@
-bool  invoked
+bool invoked
 ---
 float64 amplitude
 float64 frequency

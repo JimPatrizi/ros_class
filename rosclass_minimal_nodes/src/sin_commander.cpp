@@ -34,7 +34,7 @@ bool callBack(rosclass_minimal_nodes::sine_msg::Request &request, rosclass_minim
     request.invoked = true;
     amplitude_ = response.amplitude;
     frequency_ = response.frequency;
-
+    
     return true;
 }
 
@@ -51,8 +51,8 @@ int main(int argc, char **argv) {
     //initilize 
     double dt_sin = 0.0;
     g_vel_cmd.data = 0.0;
-    amplitude_=0.0;
-    frequency_=0.0;
+    //amplitude_=0.0;
+    //frequency_=0.0;
 
 
     
@@ -64,7 +64,8 @@ int main(int argc, char **argv) {
         dt_sin = dt_sin+0.01; //increments delt t 
         my_publisher_object.publish(g_vel_cmd); // publish the control effort computed by this 
         //sin_commander
-        ROS_INFO("vel_cmd command = %f", g_vel_cmd.data);
+        //ROS_INFO("vel_cmd command = %f", g_vel_cmd.data);
+        ROS_INFO("Amplitude: %f",amplitude_);
         ros::spinOnce(); //allow data update from callback; 
         naptime.sleep(); // wait for remainder of specified period; 
     }
