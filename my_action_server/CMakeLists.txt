@@ -32,7 +32,10 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 # Executables: uncomment the following and edit arguments to compile new nodes
 # may add more of these lines for more nodes from the same package
 # cs_add_executable(example src/example.cpp)
-cs_add_executable(my_action_server src/action_server_commander.cpp)
+cs_add_executable(action_server_commander src/action_server_commander.cpp)
+cs_add_executable(my_action_client src/my_action_client.cpp)
+
+
 #the following is required, if desire to link a node in this package with a library created in this same package
 # edit the arguments to reference the named node and named library within this package
 # target_link_library(example my_lib)

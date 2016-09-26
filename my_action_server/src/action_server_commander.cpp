@@ -64,10 +64,6 @@ public:
 // member as_ will get instantiated with specified node-handle, name by which this server will be known,
 //  a pointer to the function to be executed upon receipt of a goal.
 //  
-// Syntax of naming the function to be invoked: get a pointer to the function, called executeCB, which is a member method
-// of our class exampleActionServer.  Since this is a class method, we need to tell boost::bind that it is a class member,
-// using the "this" keyword.  the _1 argument says that our executeCB takes one argument
-// the final argument  "false" says don't start the server yet.  (We'll do this in the constructor)
 
 MyActionServer::MyActionServer() :
    as_(nh_, "my_action", boost::bind(&MyActionServer::executeCB, this, _1),false) 
@@ -92,20 +88,12 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
     //ROS_INFO("in executeCB");
     //ROS_INFO("goal input is: %d", goal->input);
     //do work here: this is where your interesting code goes
-    
-    //....
 
-    // for illustration, populate the "result" message with two numbers:
-    // the "input" is the message count, copied from goal->input (as sent by the client)
-    // the "goal_stamp" is the server's count of how many goals it has serviced so far
-    // if there is only one client, and if it is never restarted, then these two numbers SHOULD be identical...
-    // unless some communication got dropped, indicating an error
-    // send the result message back with the status of "success"
-
-   // g_count++; // keep track of total number of goals serviced since this server was started
    // result_.output = g_count; // we'll use the member variable result_, defined in our class
    // result_.goal_stamp = goal->input;
-    //amplitude_
+    amplitude_ = goal ->amplitude;
+    frequency_ = goal ->frequency;
+    as_.setSucceeded(result_);
     //frequency_
     //cycle_num_
     // the class owns the action server, so we can use its member methods here
