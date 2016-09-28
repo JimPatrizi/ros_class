@@ -32,8 +32,11 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 # Executables: uncomment the following and edit arguments to compile new nodes
 # may add more of these lines for more nodes from the same package
 # cs_add_executable(example src/example.cpp)
-cs_add_executable(action_server_commander src/action_server_commander.cpp)
+cs_add_executable(my_action_server_commander src/action_server_commander.cpp)
 cs_add_executable(my_action_client src/my_action_client.cpp)
+cs_add_executable(my_minimal_simulator src/minimal_simulator.cpp)
+
+cs_add_executable(my_minimal_controller src/minimal_controller.cpp)
 
 
 #the following is required, if desire to link a node in this package with a library created in this same package

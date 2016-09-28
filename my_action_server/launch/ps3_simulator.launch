@@ -1,0 +1,10 @@
+ 
+<launch>
+<node name="simulator" pkg="my_action_server" type="my_minimal_simulator"/>
+<node name="controller" pkg="my_action_server" type="my_minimal_controller"/>
+
+<node name="sin_plot" pkg="rqt_plot" type="rqt_plot"/>
+
+</launch>
+  
+  

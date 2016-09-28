@@ -15,7 +15,7 @@ void doneCb(const actionlib::SimpleClientGoalState& state,
         const my_action_server::serverResultConstPtr& result) {
     ROS_INFO(" doneCb: server responded with state [%s]", state.toString().c_str());
     bool diff = result->succeed;
-    ROS_INFO("got result output = %s", diff ? "true" : "false");
+    //ROS_INFO("got result output = %s", diff ? "true" : "false");
 }
 
 int main(int argc, char **argv) { 
@@ -43,6 +43,8 @@ int main(int argc, char **argv) {
     cout << "Please enter an real value for frequency: ";
     cin >> goal.frequency;
     cout << "Please enter an real integer for cycle number: ";
+    cin >> goal.cycle_num;
+
 
     action_client.sendGoal(goal, &doneCb);
 
@@ -55,6 +57,7 @@ int main(int argc, char **argv) {
             ROS_INFO("Goal Succeeded!");
             ROS_INFO("Amplitude reached: %f", goal.amplitude);
             ROS_INFO("Frequency reached: %f", goal.frequency);
+            ROS_INFO("Cycles reached: %d", goal.cycle_num);
             ROS_INFO("Goal Succeeded!");
         }
         

@@ -77,12 +77,6 @@ MyActionServer::MyActionServer() :
 }
 
 //executeCB implementation: this is a member method that will get registered with the action server
-// argument type is very long.  Meaning:
-// actionlib is the package for action servers
-// SimpleActionServer is a templated class in this package (defined in the "actionlib" ROS package)
-// <example_action_server::serverAction> customizes the simple action server to use our own "action" message 
-// defined in our package, "my_action_server", in the subdirectory "action", called "server.action"
-// The name "server" is prepended to other message types created automatically during compilation.
 // e.g.,  "serverAction" is auto-generated from (our) base name "server" and generic name "Action"
 void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_server::serverAction>::GoalConstPtr& goal) {
     //ROS_INFO("in executeCB");
@@ -93,6 +87,33 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
    // result_.goal_stamp = goal->input;
     amplitude_ = goal ->amplitude;
     frequency_ = goal ->frequency;
+    cycle_num_ = goal ->cycle_num;
+
+    double t = 0;
+    //initilize 
+    double dt_sin = 0.0;
+    g_vel_cmd.data = 0.0;
+    double loop_stop = 0.0;
+    ros::Rate naptime(1/.1); 
+    ros::NodeHandle nh; // node handle 
+    ros::Subscriber my_subscriber_object = nh.subscribe("vel_cmd", 1, myCallbackVelCmd);
+    loop_stop = (cycle_num_/frequency_);
+    ros::Publisher my_publisher_object = nh.advertise<std_msgs::Float64>("vel_cmd", 1);
+
+    while (t < loop_stop)
+        {
+            //do sin stuff here
+            g_vel_cmd.data = amplitude_*sin(frequency_*t);//calculates sine wave with user designated freq and amp
+            t = t + dt_sin;
+            //dt_sin = dt_sin+0.01; //increments delt t 
+            my_publisher_object.publish(g_vel_cmd); // publish the control effort computed by this 
+            //sin_commander
+            ROS_INFO("vel_cmd command = %f", g_vel_cmd.data);
+            
+            naptime.sleep(); // wait for remainder of specified period; 
+            // for debug, induce a halt if we ever get our client/server communications out of sync
+        }
+
     as_.setSucceeded(result_);
     //frequency_
     //cycle_num_
@@ -116,14 +137,7 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "action_server_node"); // name this node
-    ros::NodeHandle nh; // node handle 
-    ros::Subscriber my_subscriber_object = nh.subscribe("vel_cmd", 1, myCallbackVelCmd);
-    ros::Publisher my_publisher_object = nh.advertise<std_msgs::Float64>("vel_cmd", 1);
-    ros::Rate naptime(1.0/0.1); 
-
-    //initilize 
-    double dt_sin = 0.0;
-    g_vel_cmd.data = 0.0;
+      //double startTime = System.currentTimeMillis();//whoops this is java, look up C++
 
     ROS_INFO("instantiating the action server commander: ");
 
@@ -132,18 +146,11 @@ int main(int argc, char** argv) {
     ROS_INFO("going into spin");
     // from here, all the work is done in the action server, with the interesting stuff done within "executeCB()"
     // you will see 5 new topics under example_action: cancel, feedback, goal, result, status
-    while (ros::ok()) {
-        //do sin stuff here
-        g_vel_cmd.data = amplitude_*sin(frequency_*dt_sin);//calculates sine wave with user designated freq and amp
-        dt_sin = dt_sin+0.01; //increments delt t 
-        my_publisher_object.publish(g_vel_cmd); // publish the control effort computed by this 
-        //sin_commander
-        ROS_INFO("vel_cmd command = %f", g_vel_cmd.data);
-        ros::spinOnce(); //normally, can simply do: ros::spin();  
-        naptime.sleep(); // wait for remainder of specified period; 
-        // for debug, induce a halt if we ever get our client/server communications out of sync
+    
+    while (true)
+    {
+        ros::spinOnce();
     }
-
     return 0;
 }
 
