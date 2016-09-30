@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     //simulate accelerations and publish the resulting velocity; 
     ros::Publisher my_publisher_object = nh.advertise<std_msgs::Float64>("velocity", 1);
     double mass = 1.0;
-    double dt = 0.1; //10ms integration time step 
+    double dt = 0.001; //10ms integration time step 
     double sample_rate = 1.0 / dt; // compute the corresponding update frequency 
     ros::Rate naptime(sample_rate);
     g_velocity.data = 0.0; //initialize velocity to zero 

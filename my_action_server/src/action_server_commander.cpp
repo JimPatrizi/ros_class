@@ -19,6 +19,7 @@ using namespace std;
 int g_count = 0;
 bool g_count_failure = false;
 std_msgs::Float64 g_vel_cmd;
+std_msgs::Float64 zero;
 double amplitude_;
 double frequency_;
 int cycle_num_;
@@ -41,6 +42,7 @@ private:
     // it will communicate using messages defined in example_action_server/action/demo.action
     // the type "demoAction" is auto-generated from our name "demo" and generic name "Action"
     actionlib::SimpleActionServer<my_action_server::serverAction> as_;
+    ros::Publisher my_publisher_object;
     
     // here are some message types to communicate with our client(s)
     my_action_server::serverGoal goal_; // goal message, received from client
@@ -73,10 +75,18 @@ MyActionServer::MyActionServer() :
     ROS_INFO("in constructor of MyActionServer...");
     // do any other desired initializations here...specific to your implementation
 
+   // ros::NodeHandle nh; // node handle 
+    
     as_.start(); //start the server running
 }
 
 //executeCB implementation: this is a member method that will get registered with the action server
+// argument type is very long.  Meaning:
+// actionlib is the package for action servers
+// SimpleActionServer is a templated class in this package (defined in the "actionlib" ROS package)
+// <example_action_server::serverAction> customizes the simple action server to use our own "action" message 
+// defined in our package, "my_action_server", in the subdirectory "action", called "server.action"
+// The name "server" is prepended to other message types created automatically during compilation.
 // e.g.,  "serverAction" is auto-generated from (our) base name "server" and generic name "Action"
 void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_server::serverAction>::GoalConstPtr& goal) {
     //ROS_INFO("in executeCB");
@@ -88,22 +98,23 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
     amplitude_ = goal ->amplitude;
     frequency_ = goal ->frequency;
     cycle_num_ = goal ->cycle_num;
+    
+    ros::Publisher my_publisher_object = nh_.advertise<std_msgs::Float64>("vel_cmd", 1);
 
-    double t = 0;
+    
     //initilize 
-    double dt_sin = 0.0;
+    double dt_sin = 0.001;
     g_vel_cmd.data = 0.0;
-    double loop_stop = 0.0;
-    ros::Rate naptime(1/.1); 
-    ros::NodeHandle nh; // node handle 
-    ros::Subscriber my_subscriber_object = nh.subscribe("vel_cmd", 1, myCallbackVelCmd);
-    loop_stop = (cycle_num_/frequency_);
-    ros::Publisher my_publisher_object = nh.advertise<std_msgs::Float64>("vel_cmd", 1);
+    double loop_stop = (cycle_num_/frequency_);
+    ros::Rate naptime(1/dt_sin); 
+    double rad_per_sec = 2*M_PI*frequency_;
+    
 
-    while (t < loop_stop)
+    double t = 0.0;
+    while (t <= loop_stop)
         {
             //do sin stuff here
-            g_vel_cmd.data = amplitude_*sin(frequency_*t);//calculates sine wave with user designated freq and amp
+            g_vel_cmd.data = amplitude_*sin(rad_per_sec*t);//calculates sine wave with user designated freq and amp
             t = t + dt_sin;
             //dt_sin = dt_sin+0.01; //increments delt t 
             my_publisher_object.publish(g_vel_cmd); // publish the control effort computed by this 
@@ -113,7 +124,12 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
             naptime.sleep(); // wait for remainder of specified period; 
             // for debug, induce a halt if we ever get our client/server communications out of sync
         }
-
+    zero.data = 0.0;
+    
+    
+    my_publisher_object.publish(zero);    
+    
+        
     as_.setSucceeded(result_);
     //frequency_
     //cycle_num_
@@ -137,19 +153,21 @@ void MyActionServer::executeCB(const actionlib::SimpleActionServer<my_action_ser
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "action_server_node"); // name this node
-      //double startTime = System.currentTimeMillis();//whoops this is java, look up C++
+    
+    //double startTime = System.currentTimeMillis();//whoops this is java, look up C++
 
     ROS_INFO("instantiating the action server commander: ");
 
     MyActionServer as_object; // create an instance of the class "ExampleActionServer"
     
     ROS_INFO("going into spin");
+    ROS_INFO("waiting on action client...");
     // from here, all the work is done in the action server, with the interesting stuff done within "executeCB()"
     // you will see 5 new topics under example_action: cancel, feedback, goal, result, status
     
-    while (true)
+    while (ros::ok())
     {
-        ros::spinOnce();
+        ros::spin();
     }
     return 0;
 }
