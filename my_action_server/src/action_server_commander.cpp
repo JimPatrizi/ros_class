@@ -167,6 +167,7 @@ int main(int argc, char** argv) {
     
     while (ros::ok())
     {
+        ROS_INFO("waiting on action client...");
         ros::spin();
     }
     return 0;
