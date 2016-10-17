@@ -1,10 +1,15 @@
-//sample program to transform lidar data--for illustration only
-//better: use laser_pipeline, see http://wiki.ros.org/laser_pipeline
+/**
+James Patrizi
+jdp99
+PS6 LIDAR Transforms
+This project computes the height, width, length, and centroid (wrt to world coordinates)
+of the associated object found in this project's block_scan.bag file
+**/
 #include <math.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <ros/ros.h> //ALWAYS need to include this
+#include <ros/ros.h> 
 
 #include <tf/transform_listener.h>
 #include <xform_utils/xform_utils.h>
@@ -17,15 +22,18 @@ XformUtils xformUtils; //instantiate an object of XformUtils
 vector <Eigen::Vector3d> g_pt_vecs_wrt_lidar_frame; //will hold 3-D points in LIDAR frame
 vector <Eigen::Vector3d> g_pt_vecs_wrt_world_frame; //will hold 3_D points in world frame
 vector <Eigen::Vector3d> g_hit_pt_vecs_wrt_world_frame; //will hold 3_D points in world frame, that are > 0.1 on z axis
-double minx1;
-double maxx1;
+double minx1;//variables to hold the min and max coordinate detected via lidar and compared to each new point
+double maxx1;//to find the scanned min and scanned max vectors (aka the edges of the object in the bag file)
 double minz1;
 double maxz1;
 double miny1;
 double maxy1 = -1; //this value had to do with the logic of value comparison and the object is placed in the 3rd and 4th quadrants and never would be > 0 to account for if logic
-double totalx = 0.0;
+double totalx = 0.0;//variables to hold computed length, width and height information
 double totaly = 0.0;
 double averagez = 0.0;
+double centroidx; // variables to hold centroid data for each cartesian coord
+double centroidy;
+double centroidz;
 
 
 
@@ -70,6 +78,7 @@ void scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in) {
     int npts3d = g_pt_vecs_wrt_lidar_frame.size(); //this many points got converted
     ROS_INFO("computed %d 3-D pts w/rt LIDAR frame", npts3d);
     g_pt_vecs_wrt_world_frame.resize(npts3d); 
+    g_hit_pt_vecs_wrt_world_frame.resize(npts3d);//jdp99 addition
 
     //transform the points to world frame:
     //do this one point at a time; alternatively, could have listed all points
@@ -89,11 +98,11 @@ void scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in) {
     for (int i = 0; i < npts3d; i++) {
         vec = g_pt_vecs_wrt_world_frame[i]; //consider the i'th point
         if (vec[2]< 0.1) {
-         // ROS_INFO("(x,y,z) = (%6.3f, %6.3f, %6.3f)", vec[0],vec[1],vec[2]);
+         // ROS_INFO("(x,y,z) = (%6.3f, %6.3f, %6.3f)", vec[0],vec[1],vec[2]); <- this is not needed but left to illustrate what I got rid of in the example code
         }
         else {
             ROS_WARN("(x,y,z) = (%6.3f, %6.3f, %6.3f)", vec[0],vec[1],vec[2]);
-            //g_hit_pt_vecs_wrt_world_frame[j] = g_pt_vecs_wrt_world_frame[i];//contains a bucket of vectors that are all >0.1 wrt z axis
+            //The following is the logic used for comparison of the min and max x,y,z coordinates to find min and max extrema (edges of object)
             if(vec[0] < minx1){
                 minx1 = vec[0];
             }
@@ -116,12 +125,19 @@ void scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in) {
             j = j+1;
         }
     }
+    /**
+    Variables and calculations to determine LxWxH and centroidx,y,z
+    **/
     totalx = abs(minx1) + abs(maxx1);
     totaly = abs(miny1) - abs(maxy1);
     averagez = (maxz1 + minz1)/2;
-    ROS_INFO("\nTotal x:        %6.3fm = LENGTH of Object\nTotal y:        %6.3fm = WIDTH  of Object\nHeight :         %6.3fm <-----------------------------------------------For Luc", totalx,totaly,averagez);
-    ROS_WARN("\nMin x: %6.3fm \nMin y: %6.3fm \nMin z: %6.3fm (when obstacle is detected)", minx1, miny1,minz1);
-    ROS_WARN("\nMax x: %6.3fm \nMax y: %6.3fm \nMax z: %6.3fm (when obstacle is detected)", maxx1, maxy1,maxz1);
+    centroidx = maxx1 + minx1;
+    centroidy = (miny1 + abs(maxy1))/2;
+    centroidz = averagez/2;
+    //Inform user of the LxWxH centroid as well as the min and max x,y,z detected
+    ROS_INFO("\nTotal x:        %6.3fm = LENGTH of Object\nTotal y:        %6.3fm = WIDTH  of Object\nHeight :        %6.3fm\nCentroid: (%6.3f,%6.3f,%6.3f)(w.r.t. World) <-----------------------------------------------For Luc", totalx,totaly,averagez,centroidx,centroidy,centroidz);
+    ROS_WARN("The following are the outliers picked as min extrema x,y,z detected via lidar\nMin x: %6.3fm \nMin y: %6.3fm \nMin z: %6.3fm (when obstacle is detected, min z should be 0, world ground reference)", minx1, miny1,minz1);
+    ROS_WARN("The following are the outliers picked as max extrema x,y,z detected via lidar\nMax x: %6.3fm \nMax y: %6.3fm \nMax z: %6.3fm (when obstacle is detected)", maxx1, maxy1,maxz1);
 }
 
 
