@@ -1,8 +1,7 @@
 //Jim Patrizi
-// sine_commander node, minimal_joint_controller edition 
-// prompts for both amplitude and frequency
+// sine_commander node, gazebo plugin edition
 // commands sinusoidal velocities to the minimal_joint_controller node
-// publishes velocity on topics "pos_cmd" and "pos_cmd_2" for two different sinusoidal waveforms defined below
+// publishes velocity on topics "pos_cmd" and "pos_cmd_2" and pos_cmd3 for three different sinusoidal waveforms defined below
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 
