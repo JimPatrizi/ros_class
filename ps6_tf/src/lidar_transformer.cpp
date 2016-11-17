@@ -2,7 +2,7 @@
 James Patrizi
 jdp99
 PS6 LIDAR Transforms
-This project computes the height, width, length, and centroid (wrt to world coordinates)
+This node computes the height, width, length, and centroid (wrt to world coordinates)
 of the associated object found in this project's block_scan.bag file
 **/
 #include <math.h>
@@ -130,7 +130,7 @@ void scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in) {
     **/
     totalx = abs(minx1) + abs(maxx1);
     totaly = abs(miny1) - abs(maxy1);
-    averagez = (maxz1 + minz1)/2;
+    averagez = maxz1 + minz1;
     centroidx = maxx1 + minx1;
     centroidy = (miny1 + abs(maxy1))/2;
     centroidz = averagez/2;

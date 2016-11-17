@@ -16,7 +16,8 @@ Set the fixed frame to "world", add a LaserScan display with topic set to "/scan
 (e.g. 10sec).
 
 demo (crude) point transforms with:
-`rosrun lidar_wobbler lidar_transformer`
+run bag file first block_scan.bag
+`rosrun ps6_tf my_lidar_transformer`
 (try adding objects withing view of scanner and observe 3-D point values)
 
 
